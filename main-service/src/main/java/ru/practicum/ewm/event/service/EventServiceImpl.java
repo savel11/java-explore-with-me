@@ -413,7 +413,7 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toMap(ViewStatsDto::getUri, ViewStatsDto::getHits));
 
         for (Event event : events) {
-            event.setViews(uriHitMap.getOrDefault("/events/" + event.getId(), 0L));
+            event.setViews(uriHitMap.getOrDefault("/events/" + event.getId(), 1L));
         }
     }
 }
