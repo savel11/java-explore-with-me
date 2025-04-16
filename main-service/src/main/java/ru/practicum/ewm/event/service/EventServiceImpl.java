@@ -405,19 +405,11 @@ public class EventServiceImpl implements EventService {
         List<String> uri = events.stream()
                 .map(event -> "/events/" + event.getId())
                 .toList();
-        for (String str: uri) {
-            log.info("URI: " + str);
-        }
-
         List<ViewStatsDto> viewStatsDto = statisticsClient.getStats(LocalDateTime.now().minusYears(1),
                 LocalDateTime.now(), uri, true);
-        for (ViewStatsDto str: viewStatsDto) {
-            log.info("URI: " + str);
-        }
 
         Map<String, Long> uriHitMap = viewStatsDto.stream()
                 .collect(Collectors.toMap(ViewStatsDto::getUri, ViewStatsDto::getHits));
-
         for (Event event : events) {
             event.setViews(uriHitMap.getOrDefault("/events/" + event.getId(), 0L));
         }
