@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.EndpointHitDto;
 import ru.practicum.ewm.ViewStatsDto;
 import ru.practicum.ewm.exception.InvalidFormatException;
-import ru.practicum.ewm.exception.NullDateException;
 import ru.practicum.ewm.mapper.EndpointHitMapper;
 import ru.practicum.ewm.mapper.ViewStatsMapper;
 import ru.practicum.ewm.storage.StatsRepository;
