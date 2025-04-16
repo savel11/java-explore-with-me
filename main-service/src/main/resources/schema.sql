@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS events (
  location_id BIGINT NOT NULL,
  paid BOOL DEFAULT FALSE,
  participant_limit INTEGER DEFAULT 0,
- published_on TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+ published_on TIMESTAMP WITHOUT TIME ZONE,
  request_moderation BOOL DEFAULT TRUE,
  state VARCHAR(30),
  title VARCHAR(200),
