@@ -16,7 +16,6 @@ import java.util.List;
 public class UpdateCompilationRequest {
     List<Long> events;
     Boolean pinned;
-    @NotBlank(message = "Некорректный формат заголовка: Заголовок не должен быть пустым.")
     @Size(min = 1, max = 50, message = "Некорректный формат заголовка: Заголовок должен содержать от 1 до 50 символов")
     String title;
 }

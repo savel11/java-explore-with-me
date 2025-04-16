@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.practicum.ewm.error.exeptions.DateTimeException;
+import ru.practicum.ewm.error.exeptions.DuplicatedDataException;
 import ru.practicum.ewm.error.exeptions.InvalidFormatException;
 import ru.practicum.ewm.error.exeptions.NotFoundException;
 
@@ -33,6 +34,18 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleInvalidFormatException(InvalidFormatException e) {
+        return ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST.name())
+                .reason("Incorrectly made request")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .errors(Arrays.toString(e.getStackTrace()))
+                .build();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleDuplicatedDataException(DuplicatedDataException e) {
         return ApiError.builder()
                 .status(HttpStatus.BAD_REQUEST.name())
                 .reason("Incorrectly made request")
@@ -104,4 +117,6 @@ public class ErrorHandler {
                 .errors(Arrays.toString(e.getStackTrace()))
                 .build();
     }
+
+
 }

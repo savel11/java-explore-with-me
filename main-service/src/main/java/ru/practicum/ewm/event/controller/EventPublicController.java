@@ -35,25 +35,23 @@ public class EventPublicController {
                                              @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                              @RequestParam(required = false) String sort, @RequestParam(defaultValue = "0") int from,
                                              @RequestParam(defaultValue = "10") int size, HttpServletRequest request) {
-        List<EventShortDto> events = eventService.getAllPublishEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
         statisticsClient.save(EndpointHitDto.builder()
                 .app(APP)
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
                 .timestamp(LocalDateTime.now())
                 .build());
-        return events;
+        return eventService.getAllPublishEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
     }
 
     @GetMapping("/{id}")
     public EventFullDto getPublishById(@PathVariable("id") Long id, HttpServletRequest request) {
-        EventFullDto event = eventService.getPublishEventById(id);
         statisticsClient.save(EndpointHitDto.builder()
                 .app(APP)
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
                 .timestamp(LocalDateTime.now())
                 .build());
-        return event;
+        return eventService.getPublishEventById(id);
     }
 }

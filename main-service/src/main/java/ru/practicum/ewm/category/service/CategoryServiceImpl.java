@@ -43,9 +43,13 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto update(Long id, CategoryDto categoryDto) {
         log.info("Обновление категории с id = " + id);
         Category category = getCategoryById(id);
-        if (isExistCategoryByName(categoryDto.getName())) {
-            log.warn("Категории с названием: " + categoryDto.getName() + " уже существует!");
-            throw new DuplicatedDataException("Категория не обновленна: Категории с данным названием уже существует!");
+        Optional<Category> categoryOptional = categoryRepository.findByName(categoryDto.getName());
+        if (categoryOptional.isPresent()) {
+            Category cat = categoryOptional.get();
+            if (cat != null && !id.equals(cat.getId())) {
+                log.warn("Категории с названием: " + categoryDto.getName() + " уже существует!");
+                throw new DuplicatedDataException("Категория не обновленна: Категории с данным названием уже существует!");
+            }
         }
         category.setName(categoryDto.getName());
         Category newCategory = categoryRepository.save(category);
