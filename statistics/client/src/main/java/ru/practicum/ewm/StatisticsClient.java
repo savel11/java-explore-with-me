@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 
 
-
 @Service
 @Slf4j
 public class StatisticsClient {
@@ -41,7 +40,7 @@ public class StatisticsClient {
     }
 
     public void save(EndpointHitDto endpointHitDto) {
-        log.trace("Получен запрос на сохранения:" + endpointHitDto);
+        log.info("Получен запрос на сохранения:" + endpointHitDto);
         String url = serverUrl + SAVE_SUFFIX;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -54,12 +53,8 @@ public class StatisticsClient {
                 log.warn("Произошла ошибка! Код ошибки: " + response.getStatusCode());
             }
         } catch (HttpStatusCodeException e) {
-            log.warn("Произошла ошибка! Статус ошибки: " + e.getStatusCode() + " тело ответа: "
+            log.warn("Произошла ошибка! Статиска не сохранена! Статус ошибки: " + e.getStatusCode() + " тело ответа: "
                     + e.getResponseBodyAsString());
-            throw new RuntimeException("Не удалось сохранить данные!", e);
-        } catch (Exception e) {
-            log.warn("Произошла ошибка при сохранении: " + e);
-            throw new RuntimeException("Не удалось сохранить данные!", e);
         }
     }
 
@@ -70,10 +65,11 @@ public class StatisticsClient {
                 .queryParam("end", dateTimeEncoding(end))
                 .queryParam("uris", String.join(",", uris))
                 .queryParamIfPresent("unique", Optional.ofNullable(unique))
+                .build()
                 .toUriString();
         try {
             ResponseEntity<List<ViewStatsDto>> response = restTemplate.exchange(url, HttpMethod.GET, null,
-                    new ParameterizedTypeReference<>() {
+                    new ParameterizedTypeReference<List<ViewStatsDto>>() {
                     });
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 log.trace("Запрос успешно выполнин!");
@@ -84,11 +80,8 @@ public class StatisticsClient {
             }
         } catch (HttpStatusCodeException e) {
             log.warn("Произошла ошибка! Статус ошибки: " + e.getStatusCode() + " тело ответа: "
-                    + e.getResponseBodyAsString());
+                    + e.getResponseBodyAsString() + e.getMessage());
             return Collections.emptyList();
-        } catch (Exception e) {
-            log.warn("Произошла непредвиденная ошибка!");
-            throw new RuntimeException("Не удалось получить статистику!", e);
         }
     }
 
