@@ -27,7 +27,10 @@ public class ErrorHandler {
                 .reason("Incorrectly made request")
                 .message(e.getMessage())
                 .timestamp(LocalDateTime.now())
-                .errors(Arrays.toString(e.getStackTrace()))
+                .errors(Arrays.stream(e.getStackTrace())
+                        .map(element -> element.getClassName() + "." + element.getMethodName() + " (Line: " + element.getLineNumber() + ")")
+                        .limit(3)
+                        .collect(Collectors.joining("\n")))
                 .build();
     }
 
@@ -39,7 +42,10 @@ public class ErrorHandler {
                 .reason("Incorrectly made request")
                 .message(e.getMessage())
                 .timestamp(LocalDateTime.now())
-                .errors(Arrays.toString(e.getStackTrace()))
+                .errors(Arrays.stream(e.getStackTrace())
+                        .map(element -> element.getClassName() + "." + element.getMethodName() + " (Line: " + element.getLineNumber() + ")")
+                        .limit(3)
+                        .collect(Collectors.joining("\n")))
                 .build();
     }
 
@@ -51,7 +57,10 @@ public class ErrorHandler {
                 .reason("Incorrectly made request")
                 .message(e.getMessage())
                 .timestamp(LocalDateTime.now())
-                .errors(Arrays.toString(e.getStackTrace()))
+                .errors(Arrays.stream(e.getStackTrace())
+                        .map(element -> element.getClassName() + "." + element.getMethodName() + " (Line: " + element.getLineNumber() + ")")
+                        .limit(3)
+                        .collect(Collectors.joining("\n")))
                 .build();
     }
 
@@ -63,7 +72,10 @@ public class ErrorHandler {
                 .reason("The required object was not found")
                 .message(e.getMessage())
                 .timestamp(LocalDateTime.now())
-                .errors(Arrays.toString(e.getStackTrace()))
+                .errors(Arrays.stream(e.getStackTrace())
+                        .map(element -> element.getClassName() + "." + element.getMethodName() + " (Line: " + element.getLineNumber() + ")")
+                        .limit(3)
+                        .collect(Collectors.joining("\n")))
                 .build();
     }
 
@@ -75,7 +87,10 @@ public class ErrorHandler {
                 .reason("Incorrectly made request")
                 .message(e.getMessage())
                 .timestamp(LocalDateTime.now())
-                .errors(Arrays.toString(e.getStackTrace()))
+                .errors(Arrays.stream(e.getStackTrace())
+                        .map(element -> element.getClassName() + "." + element.getMethodName() + " (Line: " + element.getLineNumber() + ")")
+                        .limit(3)
+                        .collect(Collectors.joining("\n")))
                 .build();
     }
 
@@ -102,7 +117,10 @@ public class ErrorHandler {
                 .reason("Incorrectly made request")
                 .message(violations)
                 .timestamp(LocalDateTime.now())
-                .errors(Arrays.toString(e.getStackTrace()))
+                .errors(Arrays.stream(e.getStackTrace())
+                        .map(element -> element.getClassName() + "." + element.getMethodName() + " (Line: " + element.getLineNumber() + ")")
+                        .limit(3)
+                        .collect(Collectors.joining("\n")))
                 .build();
     }
 
@@ -114,9 +132,10 @@ public class ErrorHandler {
                 .reason("Incorrectly made request")
                 .message(e.getMessage())
                 .timestamp(LocalDateTime.now())
-                .errors(Arrays.toString(e.getStackTrace()))
+                .errors(Arrays.stream(e.getStackTrace())
+                        .map(element -> element.getClassName() + "." + element.getMethodName() + " (Line: " + element.getLineNumber() + ")")
+                        .limit(3)
+                        .collect(Collectors.joining("\n")))
                 .build();
     }
-
-
 }

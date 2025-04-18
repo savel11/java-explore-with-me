@@ -40,21 +40,17 @@ public class RequestServiceImpl implements RequestService {
         Event event = getEvent(eventId);
         Optional<Request> requestOp = requestRepository.findByRequesterIdAndEventId(userId, eventId);
         if (requestOp.isPresent()) {
-            log.warn("Заявка уже создана!");
             throw new DuplicatedDataException("Заявка уже была создана!");
         }
         if (event.getInitiator().equals(user)) {
-            log.warn("Инициатор события не может отправлять заявку на участия!");
             throw new InvalidFormatException("Заявка не содана: Инициатор не может отправлять заявку на участия" +
                     " в своем же собитии!");
         }
         if (!event.getState().equals(EventState.PUBLISHED)) {
-            log.warn("Заяку на участия можно отправлять только для событий в статусе опубликованно!");
             throw new InvalidFormatException("Заявка не содана: Событие еще не опубликованно!");
         }
         List<Request> confirmedRequests = requestRepository.findAllByStatusAndEventId(Status.CONFIRMED, eventId);
         if (!event.getParticipantLimit().equals(0) && event.getParticipantLimit() == confirmedRequests.size()) {
-            log.warn("Лимит запросов для данного события превышен!");
             throw new InvalidFormatException("Заявка не содана: Лимит запросов для события превышен!");
         }
         Status status;
@@ -77,7 +73,6 @@ public class RequestServiceImpl implements RequestService {
         List<Request> confirmedRequests = requestRepository.findAllByStatusAndEventId(Status.CONFIRMED, eventId);
         int numberConfirmedRequests = confirmedRequests.size();
         if (!event.getParticipantLimit().equals(0) && event.getParticipantLimit() == numberConfirmedRequests) {
-            log.warn("Лимит запросов для данного события превышен!");
             throw new InvalidFormatException("Заявки не могут быть одобренны: Лимит запросов для события превышен!");
         }
         List<Request> requests = requestRepository.findAllByIdIn(updateRequest.getRequestIds());
@@ -86,7 +81,7 @@ public class RequestServiceImpl implements RequestService {
             if (requests.stream()
                     .map(Request::getStatus)
                     .anyMatch(status -> !status.equals(Status.PENDING))) {
-                log.warn("Статус заяки можно изменять только в состояние ожидание");
+                throw new InvalidFormatException("Статус заяки можно изменять только в состояние ожидание");
             }
             if (updateRequest.getStatus().equals(Status.CONFIRMED)) {
                 if (event.getParticipantLimit() < numberConfirmedRequests + updateRequest.getRequestIds().size()) {
@@ -144,7 +139,6 @@ public class RequestServiceImpl implements RequestService {
         getUser(userId);
         Optional<Request> requestOptional = requestRepository.findById(requestId);
         if (requestOptional.isEmpty()) {
-            log.warn("Запрос не найден!");
             throw new NotFoundException("Запрос с id: " + requestId + " не найден!");
         }
         Request request = requestOptional.get();

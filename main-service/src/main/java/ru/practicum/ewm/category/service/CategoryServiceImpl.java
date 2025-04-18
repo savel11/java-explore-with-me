@@ -30,7 +30,6 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto save(NewCategoryDto newCategoryDto) {
         log.info("Добавление новой категории: " + newCategoryDto);
         if (isExistCategoryByName(newCategoryDto.getName())) {
-            log.warn("Категории с названием: " + newCategoryDto.getName() + " уже существует!");
             throw new DuplicatedDataException("Категория не добавленна: Категории с данным названием уже существует!");
         }
         Category category = categoryRepository.save(CategoryMapper.toCategory(newCategoryDto));
@@ -47,7 +46,6 @@ public class CategoryServiceImpl implements CategoryService {
         if (categoryOptional.isPresent()) {
             Category cat = categoryOptional.get();
             if (cat != null && !id.equals(cat.getId())) {
-                log.warn("Категории с названием: " + categoryDto.getName() + " уже существует!");
                 throw new DuplicatedDataException("Категория не обновленна: Категории с данным названием уже существует!");
             }
         }
@@ -81,7 +79,6 @@ public class CategoryServiceImpl implements CategoryService {
         log.info("Удаление категории с id = " + id);
         getCategoryById(id);
         if (eventRepository.existsByCategoryId(id)) {
-            log.warn("Категория не может быть уделена: Существуют события с данной категорией!");
             throw new InvalidFormatException("Невозможно удалить категорию для которой существуют события!");
         }
         categoryRepository.deleteById(id);
