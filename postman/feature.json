@@ -373,7 +373,7 @@
           }
         },
         "url": {
-          "raw": "http://localhost:8080/users/3/events/1/comments",
+          "raw": "http://localhost:8080/users/305/events/1/comments",
           "protocol": "http",
           "host": [
             "localhost"
@@ -381,7 +381,7 @@
           "port": "8080",
           "path": [
             "users",
-            "3",
+            "305",
             "events",
             "1",
             "comments"
@@ -419,7 +419,7 @@
           }
         },
         "url": {
-          "raw": "http://localhost:8080/users/1/events/10/comments",
+          "raw": "http://localhost:8080/users/1/events/100/comments",
           "protocol": "http",
           "host": [
             "localhost"
@@ -429,7 +429,7 @@
             "users",
             "1",
             "events",
-            "10",
+            "100",
             "comments"
           ]
         }
