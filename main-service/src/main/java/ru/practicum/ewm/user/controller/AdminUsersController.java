@@ -27,7 +27,7 @@ public class AdminUsersController {
     @GetMapping
     public List<UserDto> get(@RequestParam(required = false) List<Long> ids, @RequestParam(defaultValue = "0") int from,
                              @RequestParam(defaultValue = "10") int size) {
-        return userService.get(ids, from, size);
+        return userService.getUsersByIds(ids, from, size);
     }
 
     @PostMapping

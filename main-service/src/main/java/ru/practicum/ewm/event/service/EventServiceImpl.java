@@ -47,6 +47,7 @@ public class EventServiceImpl implements EventService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final StatisticsClient statisticsClient;
+    private static final int STATS_PERIOD_YEARS = 1;
 
     @Override
     @Transactional
@@ -58,7 +59,6 @@ public class EventServiceImpl implements EventService {
         Category category = getCategory(newEventDto.getCategory());
         log.trace("Проверка временных ограничений");
         if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-            log.warn("Событие не создано: Дата события не может быть раньше, чем через 2 часа от текущего момента!");
             throw new DateTimeException("Дата события не может быть раньше, чем через 2 часа от текущего момента!");
         }
         Event event = EventMapper.toEvent(newEventDto, category, user);
@@ -86,7 +86,6 @@ public class EventServiceImpl implements EventService {
         getUser(userId);
         Event event = getEvent(eventId);
         if (!event.getInitiator().getId().equals(userId)) {
-            log.warn("Невозможно просмотреть собыите: Собыите созданно другим пользователем!");
             throw new InvalidFormatException("Невозможно просмотреть собыите: " +
                     "Пользоваетль с id = " + userId + " не является создателем события!");
         }
@@ -103,13 +102,11 @@ public class EventServiceImpl implements EventService {
         Event event = getEvent(eventId);
         getUser(userId);
         if (!event.getInitiator().getId().equals(userId)) {
-            log.warn("Невозможно обновить собыите: Собыите созданно другим пользователем!");
             throw new InvalidFormatException("Невозможно обновить собыите: " +
                     "Пользоваетль с id = " + userId + " не является создателем события!");
         }
         log.trace("Проверка статуса события");
-        if (event.getState().equals(EventState.PUBLISHED)) {
-            log.warn("Событие не может быть обновленно: Событие уже опубликованно!");
+        if (EventState.PUBLISHED.equals(event.getState())) {
             throw new InvalidFormatException("Нельзя редактировать опубликованные события!");
         }
         if (updateEventDto.getStateAction() != null) {
@@ -130,7 +127,6 @@ public class EventServiceImpl implements EventService {
         }
         if (updateEventDto.getEventDate() != null) {
             if (updateEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-                log.warn("Событие не создано: Дата события не может быть раньше, чем через 2 часа от текущего момента!");
                 throw new DateTimeException("Дата события не может быть раньше, чем через 2 часа от текущего момента!");
             } else {
                 event.setEventDate(updateEventDto.getEventDate());
@@ -201,7 +197,6 @@ public class EventServiceImpl implements EventService {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(QEvent.event.state.eq(EventState.PUBLISHED));
         if ((rangeStart != null) && (rangeEnd != null) && (rangeEnd.isBefore(rangeStart))) {
-            log.warn("Некорректный диапазон поиска!");
             throw new DateTimeException("Некорректный диапазон поиска! Дата начала должна быть раньше, чем дата конца!");
         }
         if (rangeStart == null && rangeEnd == null) {
@@ -266,7 +261,6 @@ public class EventServiceImpl implements EventService {
             booleanBuilder.and(QEvent.event.category.id.in(categories));
         }
         if ((rangeStart != null) && (rangeEnd != null) && (rangeEnd.isBefore(rangeStart))) {
-            log.warn("Некорректный диапазон поиска!");
             throw new DateTimeException("Некорректный диапазон поиска! Дата начала должна быть раньше, чем дата конца!");
         }
         if (rangeStart == null && rangeEnd == null) {
@@ -296,20 +290,17 @@ public class EventServiceImpl implements EventService {
         Event event = getEvent(eventId);
         if (updateEventDto.getStateAction() != null) {
             if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(1)) &&
-                    updateEventDto.getStateAction().equals(StateActionAdmin.PUBLISH_EVENT)) {
-                log.warn("Событие не опубликованно: Дата начала изменяемого события должна быть не ранее чем за час от даты публикации!");
+                    StateActionAdmin.PUBLISH_EVENT.equals(updateEventDto.getStateAction())) {
                 throw new InvalidFormatException("Дата начала изменяемого события должна быть не ранее чем за час от даты публикации");
             }
-            if (updateEventDto.getStateAction().equals(StateActionAdmin.PUBLISH_EVENT)) {
-                if (!event.getState().equals(EventState.PENDING)) {
-                    log.warn("Невозможно опубликовать событие, которое не находиться в состояние ожидания публикации!");
+            if (StateActionAdmin.PUBLISH_EVENT.equals(updateEventDto.getStateAction())) {
+                if (!EventState.PENDING.equals(event.getState())) {
                     throw new InvalidFormatException("Событие не может быть опубликовано, если оно не в состоянии ожидания!");
                 }
                 event.setState(EventState.PUBLISHED);
                 event.setPublishedOn(LocalDateTime.now());
-            } else if (updateEventDto.getStateAction().equals(StateActionAdmin.REJECT_EVENT)) {
-                if (event.getState().equals(EventState.PUBLISHED)) {
-                    log.warn("Невозможно отклонить опубликованное событие!");
+            } else if (StateActionAdmin.REJECT_EVENT.equals(updateEventDto.getStateAction())) {
+                if (EventState.PUBLISHED.equals(event.getState())) {
                     throw new InvalidFormatException("Событие не может быть отменнено, если оно опубликованно!");
                 }
                 event.setState(EventState.CANCELED);
@@ -328,7 +319,6 @@ public class EventServiceImpl implements EventService {
         }
         if (updateEventDto.getEventDate() != null) {
             if (updateEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-                log.warn("Событие не создано: Дата события не может быть раньше, чем через 2 часа от текущего момента!");
                 throw new DateTimeException("Дата события не может быть раньше, чем через 2 часа от текущего момента!");
             } else {
                 event.setEventDate(updateEventDto.getEventDate());
@@ -405,7 +395,7 @@ public class EventServiceImpl implements EventService {
         List<String> uri = events.stream()
                 .map(event -> "/events/" + event.getId())
                 .toList();
-        List<ViewStatsDto> viewStatsDto = statisticsClient.getStats(LocalDateTime.now().minusYears(1),
+        List<ViewStatsDto> viewStatsDto = statisticsClient.getStats(LocalDateTime.now().minusYears(STATS_PERIOD_YEARS),
                 LocalDateTime.now(), uri, true);
 
         Map<String, Long> uriHitMap = viewStatsDto.stream()

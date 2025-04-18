@@ -9,10 +9,10 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class ApiError {
-    String status;
-    String reason;
-    String message;
+    private String status;
+    private String reason;
+    private String message;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime timestamp;
-    String errors;
+    private LocalDateTime timestamp;
+    private String errors;
 }

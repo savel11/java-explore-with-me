@@ -29,7 +29,6 @@ public class UserServiceImpl implements UserService {
         log.info("Процесс создание нового пользователя: " + newUserRequest);
         log.trace("Проверка на дубликат email: " + newUserRequest.getEmail());
         if (userRepository.existsByEmail(newUserRequest.getEmail())) {
-            log.warn("Пользователь не был создан: Пользователь с таким email уже существует");
             throw new DuplicatedDataException("Пользователь с данным email уже сущесвует");
         }
         log.trace("Проверка пройдена!");
@@ -40,7 +39,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserDto> get(List<Long> ids, int from, int size) {
+    public List<UserDto> getUsersByIds(List<Long> ids, int from, int size) {
         PageRequest pageRequest = PageRequest.of(from, size, Sort.by("id").ascending());
         if (ids == null || ids.isEmpty()) {
             log.info("Получаем список всех пользователей");
